@@ -15,13 +15,20 @@ class Game
     @lose = false
     @game_mode = game_modes
     @game_mode.playing
+    Game.again
   end
 
   def game_modes
     ask_game_modes
     mode = gets.chomp.to_i
     valid_mode?(mode)
-    mode == 1 ? CodeBreaker.new : CodeMaker.new
+    if mode == 1
+      CodeBreaker.new 
+    elsif mode == 2
+      CodeMaker.new
+    else
+      game_modes
+    end
   end
 
   def self.lose?
@@ -33,7 +40,9 @@ class Game
     if play_again == "y"
       Game.new
     else
-      puts "\nGAME OVER!\n"
+      puts "------------"
+      puts " GAME OVER!"
+      puts "------------"
     end
   end
 end

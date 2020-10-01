@@ -38,7 +38,7 @@ module Setup
     end
 
     def start
-      puts "The code is made of four digits, between 0 and 9. Let's go!"
+      puts "The code is made of four digits, between 1 and 6. Let's go!"
       block
     end
 

@@ -3,20 +3,21 @@
 class CodeMaker
   attr_accessor :turn, :x, :y
   
-
   include Setup
 
   def initialize
     @turn = 10
     code_maker
-    @code = gets.chomp.scan /\d/
-    @guessing_code = "1122".scan /\d/
-    @posible_answers = (1111...6666).to_a
+    @code = gets.chomp.chars
+    @guessing_code = "1122".chars
+    colors = "123456".chars
+    @posible_answers = colors.product(*[colors] * 3).map(&:join)
   end
 
   def playing
     if @turn == 0
       win
+      again
     else
       @turn -= 1
       self.guessing_turn
@@ -24,15 +25,18 @@ class CodeMaker
   end
 
   def guessing_turn
-    puts "Let's see..."
+    sleep 0.8
+    puts "\nLet's see..."
+    sleep 1
     puts "Mmmm..."
+    sleep 1.5
     puts "Is it:\n #{@guessing_code}?"
     self.guess
   end
 
   def guess
     if @guessing_code.eql?(@code)
-      win
+      lose
       again
     else
       self.correct(@guessing_code)
@@ -47,7 +51,7 @@ class CodeMaker
   def correct(guess)
     @a_count = 0
     i = 0
-    p @code
+    @code
     while i < guess.size
       if @code[i].to_i == guess[i].to_i
         @a_count += 1
@@ -62,18 +66,16 @@ class CodeMaker
     @matches = @code.select{ |digit| guess.include?(digit) }.size
     if @matches > @a_count
       @b_count = @matches - @a_count
-      puts "#{@matches} - #{@a_count} m > a"
     elsif @matches == @a_count
       @b_count = 0
-      puts "#{@matches} = #{@a_count}"
     elsif @matches < @a_count
       @b_count = @a_count - @matches
-      puts "#{@a_count} - #{@matches} a > m"
     end
   end
 
   def result
-    puts "#{@a_count} in position"
+    sleep 2
+    puts "\n#{@a_count} in position"
     puts "#{@b_count} match but in wrong position"
   end
 end
@@ -84,20 +86,23 @@ def reduce_options
 
   if @matches == 0
     reject_posibles = @guessing_code.to_a.uniq!
-    p "#{reject_posibles} r_p matches = 0"
     while i < reject_posibles.size
       new_posibles[i] = @posible_answers.reject { |p_a| p_a.to_s.include?(reject_posibles[i]) }
       i += 1
     end
-    p @posible_answers = new_posibles.flatten
-  else
+    @posible_answers = new_posibles.flatten
+  elsif @matches < 4
     combinations = @guessing_code.combination(@matches).to_a.uniq!
-    p "#{combinations} combinations"
-    while i < combinations.size
-      p combinations[i].join("")
-      new_posibles[i] = @posible_answers.select { |p_a| p_a.to_s.include?(combinations[i].join("")) }
-      i += 1
+    if combinations != nil
+      while i < combinations.size
+        combinations[i].join("")
+        new_posibles[i] = @posible_answers.select { |p_a| p_a.to_s.include?(combinations[i].join("")) }
+        i += 1
+      end
+    else
+      @posible_answers.shift
     end
+
     @posible_answers = new_posibles.flatten
   end
 end
